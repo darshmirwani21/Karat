@@ -1,0 +1,115 @@
+.transactions {
+  width: 100%;
+}
+
+.transactions-filters {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.search-input,
+.filter-select {
+  padding: 0.75rem;
+  border: 1px solid #333;
+  border-radius: 6px;
+  background: #1a1a1a;
+  color: #fff;
+  font-size: 1rem;
+}
+
+.search-input {
+  flex: 1;
+}
+
+.transactions-table {
+  background: #1a1a1a;
+  border-radius: 8px;
+  border: 1px solid #333;
+  overflow: hidden;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead {
+  background: #252525;
+}
+
+th {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: #aaa;
+  border-bottom: 1px solid #333;
+}
+
+td {
+  padding: 1rem;
+  border-bottom: 1px solid #333;
+  color: #fff;
+}
+
+tbody tr:hover {
+  background: #252525;
+}
+
+.expense {
+  color: #f87171;
+}
+
+.income {
+  color: #4ade80;
+}
+
+.no-transactions {
+  text-align: center;
+  color: #666;
+  font-style: italic;
+  padding: 2rem !important;
+}
+
+.transactions-loading {
+  text-align: center;
+  padding: 3rem;
+  color: #aaa;
+}
+
+@media (prefers-color-scheme: light) {
+  .transactions-table {
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+  }
+  
+  thead {
+    background: #f0f0f0;
+  }
+  
+  th {
+    color: #666;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  td {
+    color: #213547;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  tbody tr:hover {
+    background: #f5f5f5;
+  }
+  
+  .search-input,
+  .filter-select {
+    background: #fff;
+    border: 1px solid #ddd;
+    color: #213547;
+  }
+  
+  .no-transactions {
+    color: #999;
+  }
+}
+
