@@ -99,7 +99,7 @@ class SavingsOptimizer:
         """
         Recalculate savings plan after an unexpected expense
         
-        Args:
+        Arguments:
             original_plan: Original weekly savings plan
             unexpected_expense: Amount of unexpected expense
             week_occurred: Which week the expense occurred
