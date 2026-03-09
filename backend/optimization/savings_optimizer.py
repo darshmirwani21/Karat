@@ -102,7 +102,7 @@ class SavingsOptimizer:
         Arguments:
             original_plan: Original weekly savings plan
             unexpected_expense: Amount of unexpected expense
-            week_occurred: Which week the expense occurred
+            week_occurred: Which week the expelsnse occurred
             
         Returns:
             Adjusted weekly savings plan
