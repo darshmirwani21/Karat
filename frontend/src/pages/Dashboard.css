@@ -3,7 +3,20 @@
 }
 
 .dashboard h1 {
+  margin-bottom: 0.5rem;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 2rem;
+}
+
+.last-updated {
+  color: #666;
+  font-size: 0.9rem;
+  margin: 0;
 }
 
 .summary-cards {
@@ -38,6 +51,10 @@
   color: #4ade80;
 }
 
+.summary-card .amount.expenses {
+  color: #f87171;
+}
+
 .dashboard-section {
   margin-top: 3rem;
   padding: 2rem;
@@ -48,6 +65,144 @@
 
 .dashboard-section h2 {
   margin-top: 0;
+  margin-bottom: 1.5rem;
+}
+
+.charts-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-top: 3rem;
+}
+
+.chart-half {
+  min-width: 0;
+}
+
+.chart-container {
+  position: relative;
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.savings-rate-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  pointer-events: none;
+}
+
+.savings-rate-value {
+  display: block;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #fff;
+}
+
+.savings-rate-text {
+  display: block;
+  font-size: 0.9rem;
+  color: #aaa;
+  margin-top: 0.25rem;
+}
+
+.custom-tooltip {
+  background: rgba(0, 0, 0, 0.8);
+  padding: 0.75rem;
+  border-radius: 4px;
+  border: 1px solid #333;
+  color: #fff;
+}
+
+.tooltip-label {
+  margin: 0 0 0.25rem 0;
+  font-weight: bold;
+}
+
+.tooltip-value {
+  margin: 0 0 0.25rem 0;
+  color: #4ade80;
+}
+
+.tooltip-percentage {
+  margin: 0;
+  color: #aaa;
+  font-size: 0.9rem;
+}
+
+.anomalies-container {
+  min-height: 100px;
+}
+
+.anomalies-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.anomaly-card {
+  background: rgba(248, 113, 113, 0.1);
+  border: 1px solid rgba(248, 113, 113, 0.3);
+  border-radius: 6px;
+  padding: 1rem;
+}
+
+.anomaly-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.anomaly-merchant {
+  font-weight: bold;
+  color: #fff;
+}
+
+.anomaly-badge {
+  background: #f87171;
+  color: #fff;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.anomaly-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.anomaly-amount {
+  color: #f87171;
+  font-weight: bold;
+}
+
+.anomaly-category {
+  color: #aaa;
+}
+
+.anomaly-date {
+  color: #666;
+}
+
+.no-data, .no-anomalies {
+  text-align: center;
+  color: #666;
+  font-style: italic;
+  padding: 2rem;
+}
+
+.no-anomalies {
+  color: #4ade80;
+  font-style: normal;
+  font-weight: bold;
 }
 
 .placeholder {
@@ -76,8 +231,90 @@
     color: #213547;
   }
   
+  .summary-card .amount.expenses {
+    color: #dc2626;
+  }
+  
+  .last-updated {
+    color: #666;
+  }
+  
+  .custom-tooltip {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #ddd;
+    color: #213547;
+  }
+  
+  .tooltip-value {
+    color: #16a34a;
+  }
+  
+  .tooltip-percentage {
+    color: #666;
+  }
+  
+  .anomaly-card {
+    background: rgba(220, 38, 38, 0.1);
+    border: 1px solid rgba(220, 38, 38, 0.3);
+  }
+  
+  .anomaly-merchant {
+    color: #213547;
+  }
+  
+  .anomaly-badge {
+    background: #dc2626;
+  }
+  
+  .anomaly-amount {
+    color: #dc2626;
+  }
+  
+  .anomaly-category {
+    color: #666;
+  }
+  
+  .anomaly-date {
+    color: #999;
+  }
+  
+  .savings-rate-value {
+    color: #213547;
+  }
+  
+  .savings-rate-text {
+    color: #666;
+  }
+  
+  .no-data {
+    color: #999;
+  }
+  
   .placeholder {
     color: #999;
+  }
+}
+
+@media (max-width: 768px) {
+  .charts-row {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .anomalies-list {
+    grid-template-columns: 1fr;
+  }
+  
+  .anomaly-details {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
   }
 }
 

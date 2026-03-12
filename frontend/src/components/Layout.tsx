@@ -34,6 +34,12 @@ export default function Layout({ children }: LayoutProps) {
           >
             Transactions
           </Link>
+          <Link 
+            to="/connect" 
+            className={location.pathname === '/connect' ? 'active' : ''}
+          >
+            Connect Bank
+          </Link>
         </div>
       </nav>
       <main className="main-content">

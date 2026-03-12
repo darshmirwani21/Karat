@@ -2,7 +2,7 @@
 AI-powered financial planning API endpoints - real goals and recommendations from DB
 """
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -94,33 +94,121 @@ async def generate_recommendations(
     db: Session = Depends(get_db),
 ):
     """
-    Generate AI-powered savings recommendations for a goal (stub: creates one placeholder).
+    Generate AI-powered savings recommendations for a goal
     """
-    goal = db.query(models.SavingsGoal).filter(models.SavingsGoal.id == goal_id).first()
-    if not goal:
-        raise HTTPException(status_code=404, detail="Goal not found")
-    # TODO: Call optimization + ML to generate week-by-week plan
-    from datetime import timedelta
-    rec = models.SavingsRecommendation(
-        goal_id=goal_id,
-        week_start=datetime.utcnow(),
-        recommended_amount=goal.target_amount / 10,
-        reasoning="Placeholder: distribute goal over 10 weeks.",
-    )
-    db.add(rec)
-    db.commit()
-    db.refresh(rec)
-    return {
-        "recommendations": [
-            {
-                "id": rec.id,
-                "week_start": rec.week_start.isoformat() if rec.week_start else None,
-                "recommended_amount": rec.recommended_amount,
-                "reasoning": rec.reasoning or "",
-                "user_approved": rec.user_approved,
-            }
-        ]
-    }
+    try:
+        # Look up the goal by goal_id
+        goal = db.query(models.SavingsGoal).filter(models.SavingsGoal.id == goal_id).first()
+        if not goal:
+            raise HTTPException(status_code=404, detail="Goal not found")
+        
+        # Look up the user's recent transactions (last 90 days) from DB
+        ninety_days_ago = datetime.now() - timedelta(days=90)
+        transactions = db.query(models.Transaction).filter(
+            models.Transaction.account_id.in_(
+                db.query(models.Transaction.account_id).filter(
+                    models.Transaction.date >= ninety_days_ago,
+                    models.Transaction.amount > 0  # Expenses only
+                )
+            ),
+            models.Transaction.date >= ninety_days_ago,
+            models.Transaction.amount > 0
+        ).all()
+        
+        # Calculate weeks until target
+        weeks_until_target = (goal.target_date - datetime.now()).days / 7
+        weeks_until_target = max(1, int(weeks_until_target))
+        
+        # Prepare expense forecast
+        if len(transactions) >= 14:
+            from ml.spending_forecast import SpendingForecaster
+            forecaster = SpendingForecaster()
+            transaction_data = [
+                {"date": t.date.isoformat(), "amount": t.amount}
+                for t in transactions
+            ]
+            forecaster.train(transaction_data)
+            weekly_expenses = forecaster.get_weekly_forecast(weeks_until_target)
+        else:
+            # Default estimate: assume 60% of monthly income goes to expenses
+            # We need to estimate monthly income from income transactions
+            income_transactions = db.query(models.Transaction).filter(
+                models.Transaction.date >= ninety_days_ago,
+                models.Transaction.amount < 0  # Income transactions
+            ).all()
+            
+            if income_transactions:
+                monthly_income = abs(sum(t.amount for t in income_transactions)) * (30/90)  # Scale to monthly
+            else:
+                monthly_income = 4000  # Default assumption
+            
+            weekly_expenses = [(monthly_income * 0.6) / 4.33] * weeks_until_target
+        
+        # Estimate weekly income (if we have income data)
+        income_transactions = db.query(models.Transaction).filter(
+            models.Transaction.date >= ninety_days_ago,
+            models.Transaction.amount < 0  # Income transactions
+        ).all()
+        
+        if income_transactions:
+            monthly_income = abs(sum(t.amount for t in income_transactions)) * (30/90)
+        else:
+            monthly_income = 4000  # Default assumption
+        
+        weekly_income = monthly_income / 4.33
+        
+        # Call SavingsOptimizer
+        from optimization.savings_optimizer import SavingsOptimizer
+        optimizer = SavingsOptimizer()
+        result = optimizer.optimize_weekly_savings(
+            goal_amount=goal.target_amount,
+            target_date=goal.target_date,
+            current_savings=goal.current_amount,
+            weekly_income=weekly_income,
+            weekly_expenses_forecast=weekly_expenses
+        )
+        
+        if "error" in result:
+            raise HTTPException(status_code=400, detail=result["error"])
+        
+        # Delete any existing recommendations for that goal
+        db.query(models.SavingsRecommendation).filter(
+            models.SavingsRecommendation.goal_id == goal_id
+        ).delete()
+        
+        # Create one SavingsRecommendation row per week in the plan
+        recommendations = []
+        for i, weekly_amount in enumerate(result["weekly_plan"]):
+            week_start = datetime.now() + timedelta(weeks=i)
+            rec = models.SavingsRecommendation(
+                goal_id=goal_id,
+                week_start=week_start,
+                recommended_amount=weekly_amount,
+                reasoning=f"Week {i+1} of {result['weeks']}: based on your spending forecast"
+            )
+            recommendations.append(rec)
+        
+        db.add_all(recommendations)
+        db.commit()
+        
+        # Return all recommendations
+        return {
+            "recommendations": [
+                {
+                    "id": rec.id,
+                    "week_start": rec.week_start.isoformat() if rec.week_start else None,
+                    "recommended_amount": rec.recommended_amount,
+                    "reasoning": rec.reasoning or "",
+                    "user_approved": rec.user_approved,
+                }
+                for rec in recommendations
+            ]
+        }
+        
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to generate recommendations: {str(e)}")
 
 
 @router.post("/recommendations/{recommendation_id}/approve")

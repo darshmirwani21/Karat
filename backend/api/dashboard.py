@@ -197,3 +197,52 @@ async def get_spending_anomalies(
     detector = SpendingAnomalyDetector(contamination=0.05)
     anomalies = detector.detect_anomalies(transactions)
     return {"anomalies": anomalies}
+
+
+@router.get("/forecast")
+async def get_spending_forecast(
+    user_id: int = Query(1),
+    weeks: int = Query(8, ge=1, le=52),
+    db: Session = Depends(get_db),
+):
+    """
+    Get spending forecast for the next N weeks
+    """
+    # Query last 90 days of expense transactions for the user
+    ninety_days_ago = datetime.now() - timedelta(days=90)
+    transactions = db.query(models.Transaction).filter(
+        models.Transaction.account_id.in_(
+            db.query(models.Transaction.account_id).filter(
+                models.Transaction.date >= ninety_days_ago,
+                models.Transaction.amount > 0  # Expenses only
+            )
+        ),
+        models.Transaction.date >= ninety_days_ago,
+        models.Transaction.amount > 0
+    ).all()
+    
+    # If fewer than 14 transactions, return insufficient data message
+    if len(transactions) < 14:
+        return {"forecast": [], "message": "Not enough data for forecast"}
+    
+    # Train SpendingForecaster and get weekly forecast
+    from ml.spending_forecast import SpendingForecaster
+    forecaster = SpendingForecaster()
+    transaction_data = [
+        {"date": t.date.isoformat(), "amount": t.amount}
+        for t in transactions
+    ]
+    
+    try:
+        forecaster.train(transaction_data)
+        weekly_forecast = forecaster.get_weekly_forecast(weeks)
+        
+        forecast_data = [
+            {"week": i + 1, "predicted_spending": amount}
+            for i, amount in enumerate(weekly_forecast)
+        ]
+        
+        return {"forecast": forecast_data, "message": "ok"}
+        
+    except ValueError as e:
+        return {"forecast": [], "message": f"Forecast failed: {str(e)}"}

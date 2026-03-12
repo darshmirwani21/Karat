@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import Dashboard from './pages/Dashboard'
 import Goals from './pages/Goals'
 import Transactions from './pages/Transactions'
+import BankConnect from './components/BankConnect'
 import Layout from './components/Layout'
 import './App.css'
 
@@ -17,6 +18,7 @@ function App() {
             <Route path="/" element={<Dashboard />} />
             <Route path="/goals" element={<Goals />} />
             <Route path="/transactions" element={<Transactions />} />
+            <Route path="/connect" element={<BankConnect />} />
           </Routes>
         </Layout>
       </Router>

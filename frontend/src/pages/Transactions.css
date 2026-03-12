@@ -22,6 +22,19 @@
   flex: 1;
 }
 
+.transactions-summary {
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background: #1a1a1a;
+  border-radius: 6px;
+  border: 1px solid #333;
+}
+
+.summary-text {
+  color: #aaa;
+  font-size: 0.9rem;
+}
+
 .transactions-table {
   background: #1a1a1a;
   border-radius: 8px;
@@ -44,6 +57,21 @@ th {
   font-weight: 600;
   color: #aaa;
   border-bottom: 1px solid #333;
+  position: relative;
+}
+
+th.sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.2s;
+}
+
+th.sortable:hover {
+  color: #fff;
+}
+
+th.sortable.active {
+  color: #4ade80;
 }
 
 td {
@@ -58,10 +86,22 @@ tbody tr:hover {
 
 .expense {
   color: #f87171;
+  font-weight: 500;
 }
 
 .income {
   color: #4ade80;
+  font-weight: 500;
+}
+
+.category-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #fff;
+  text-transform: capitalize;
 }
 
 .no-transactions {
@@ -77,8 +117,45 @@ tbody tr:hover {
   color: #aaa;
 }
 
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding: 1rem;
+}
+
+.pagination-button {
+  background: #4ade80;
+  color: #000;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.pagination-button:hover:not(:disabled) {
+  background: #22c55e;
+}
+
+.pagination-button:disabled {
+  background: #666;
+  color: #aaa;
+  cursor: not-allowed;
+}
+
+.pagination-info {
+  color: #aaa;
+  font-size: 0.9rem;
+}
+
 @media (prefers-color-scheme: light) {
-  .transactions-table {
+  .transactions-table,
+  .transactions-summary {
     background: #f9f9f9;
     border: 1px solid #ddd;
   }
@@ -90,6 +167,14 @@ tbody tr:hover {
   th {
     color: #666;
     border-bottom: 1px solid #ddd;
+  }
+  
+  th.sortable:hover {
+    color: #213547;
+  }
+  
+  th.sortable.active {
+    color: #16a34a;
   }
   
   td {
@@ -108,8 +193,63 @@ tbody tr:hover {
     color: #213547;
   }
   
+  .summary-text {
+    color: #666;
+  }
+  
   .no-transactions {
     color: #999;
+  }
+  
+  .pagination-button {
+    background: #4ade80;
+    color: #000;
+  }
+  
+  .pagination-button:hover:not(:disabled) {
+    background: #22c55e;
+  }
+  
+  .pagination-button:disabled {
+    background: #ddd;
+    color: #999;
+  }
+  
+  .pagination-info {
+    color: #666;
+  }
+}
+
+@media (max-width: 768px) {
+  .transactions-filters {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .search-input {
+    width: 100%;
+  }
+  
+  .filter-select {
+    width: 100%;
+  }
+  
+  table {
+    font-size: 0.9rem;
+  }
+  
+  th, td {
+    padding: 0.5rem;
+  }
+  
+  .category-badge {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
+  }
+  
+  .pagination {
+    flex-direction: column;
+    gap: 0.5rem;
   }
 }
 
